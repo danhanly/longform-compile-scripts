@@ -1,4 +1,4 @@
-# Obsidian 🫶 Longform
+# Obsidian 🫶 Longform 🫶 Pandoc
 
 Longform is a writing plugin for Obsidian. One of the features is that it allows you to compile your writing project, taking it through a series of steps to produce a final document. This may be things like stripping out internal links, or removing comments. But often we can take things a step further...
 
