@@ -48,13 +48,13 @@ h1 {
   text-align: center;
 }
 h2 {
-  margin: 1.5em auto 0;
+  margin: 1.5em auto 1em;
   font-size: 1.5em;
   line-height: 135%;
   text-align: center;
 }
 h3 {
-  margin: 1.3em auto 0;
+  margin: 1.3em auto 1em;
   font-size: 1.3em;
   text-align: center;
 }
@@ -71,12 +71,14 @@ h6 {
 }
 h1, h2, h3, h4, h5, h6 {
   text-indent: 0;
-  text-align: left;
+  text-align: center;
   font-weight: bold;
   page-break-after: avoid;
   page-break-inside: avoid;
 }
-
+h1 {
+  page-break-before: always;
+}
 ol, ul {
   margin: 1em 0 0 1.7em;
 }
@@ -136,8 +138,22 @@ header {
   margin-bottom: 4em;
   text-align: center;
 }
-#TOC h1 {
-  content: "Table of Contents";
+#copyright {
+  margin-top: 5em !important;
+}
+#copyright p {
+  font-size: 0.7em !important;
+  font-style: italic !important;
+  text-indent: 0 !important;
+}
+#acknowledgements {
+  margin-top: 5em !important;
+}
+#acknowledgements p {
+  font-size: 0.7em !important;
+  font-style: italic !important;
+  text-indent: 0 !important;
+  text-align: center !important;
 }
 #TOC li {
   list-style: none;
@@ -157,7 +173,6 @@ code {
 span.smallcaps {
   font-variant: small-caps;
 }
-
 /* This is the most compatible CSS, but it only allows two columns: */
 div.column {
   display: inline-block;
