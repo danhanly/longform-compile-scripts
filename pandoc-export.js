@@ -18,6 +18,13 @@ async function compile(input, context) {
     userScriptPath = userScriptPath + "/";
   }
 
+  let epubMetadataPath = context.optionValues["epubMetadataPath"].trim();
+  if (!epubMetadataPath) {
+    epubMetadataPath = 'meta.yml';
+  }
+
+  const metadataPath = path.join(basePath, projectPath, epubMetadataPath);
+
   let epubCssPath = context.optionValues["epubCssPath"].trim();
   if (!epubCssPath) {
      epubCssPath = path.join(basePath, userScriptPath, 'pandoc', 'epub.css');
@@ -37,24 +44,58 @@ async function compile(input, context) {
   const outputFileName = lastModifiedFile.path.replace(/\.[^/.]+$/, "");
   const outputFilePath = path.join(basePath, outputFileName);
 
-  console.log(outputFilePath);
-  console.log(manuscriptPath);
+  const tocArgs = context.optionValues["toc"] ? ['--toc',  '--toc-depth=1', '-M toc-title="Table of Contents"', '-V toc-title="Table of Contents"'] : [];
 
   const processExport = () => {
     if (compileAsDocx) {
       const compiledFilePath = outputFilePath + ".docx";
-      const docxResult = spawnSync(`"${pandocPath}"`, [`"${manuscriptPath}"`, '--from=markdown', `-o "${compiledFilePath}"`, '--to=docx', `--css="${epubCssPath}"`, '--toc', '--toc-depth=1', '-M toc-title="Table of Contents"', '-V toc-title="Table of Contents"', '-s'], {encoding: "utf-8", shell: true});
+      console.log('Compiling DocX File at "' + compiledFilePath + '" using css at "' + epubCssPath + '"');
+
+      const docxResult = spawnSync(`"${pandocPath}"`, [
+        `"${manuscriptPath}"`,
+        '--from=markdown',
+        `-o "${compiledFilePath}"`,
+        '--to=docx', 
+        `--css="${epubCssPath}"`,
+        ...tocArgs,
+        '-s'
+      ], {encoding: "utf-8", shell: true});
+      
+      if (docxResult.status !== 0) {
+        console.log(docxResult.stderr)
+        console.log(docxResult.stdout)
+      }
     }
 
     if (compileAsEpub) {
       const compiledFilePath = outputFilePath + ".epub";
-      const epubResult = spawnSync(`"${pandocPath}"`, [`"${manuscriptPath}"`, '--from=markdown', `-o "${compiledFilePath}"`, '--to=epub', `--css="${epubCssPath}"`, '--toc', '--toc-depth=1', '-M toc-title="Table of Contents"', '-V toc-title="Table of Contents"', '-s'], {encoding: "utf-8", shell: true});
+      console.log('Compiling EPUB File at "' + compiledFilePath + '" using metadata at "' + metadataPath + '" and css at "' + epubCssPath + '"');
+      
+      let metadataArg = "--metadata-file=";
+      if (metadataPath.includes('.xml')) {
+        metadataArg = "--epub-metadata=";
+      }
+
+      const epubResult = spawnSync(`"${pandocPath}"`, [
+        `"${manuscriptPath}"`,
+        '--from=markdown',
+        `-o "${compiledFilePath}"`,
+        '--to=epub',
+        `${metadataArg}"${metadataPath}"`,
+        `--css="${epubCssPath}"`,
+        ...tocArgs,
+        '-s'
+      ], {encoding: "utf-8", shell: true});
+
+      if (epubResult.status !== 0) {
+        console.log(epubResult.stderr)
+        console.log(epubResult.stdout)
+      }
     }
   };
 
   await processExport();
 }
-
 
 module.exports = {
   description: {
@@ -65,7 +106,7 @@ module.exports = {
       {
         id: "pandocPath",
         name: "Direct Path of Pandoc",
-        description: "Run $ which pandoc in Mac/Linux or $ Get-Command pandoc in Windows",
+        description: "Run '$ which pandoc' in Mac/Linux or '$ Get-Command pandoc' in Windows Powershell to discover the direct path.",
         type: "Text",
         default: "",
       },
@@ -75,6 +116,20 @@ module.exports = {
         description: "You can provide your own, or trust the one packaged with this script",
         type: "Text",
         default: "",
+      },
+      {
+        id: "epubMetadataPath",
+        name: "Location of your epub metadata file.",
+        description: "Leave this blank to look for meta.yml in the project index folder. ePubs without metadata will often not be accepted by major ebook retailers. Can be either a .yml file or in an .xml file, adhering to the Dublic Core standards.",
+        type: "Text",
+        default: "",
+      },
+      {
+        id: "toc",
+        name: "Include a Table of Contents?",
+        description: "Table of Contents will be automatically generated. For .docx files, the table of contents must be manually refreshed on the first open of the file.",
+        type: "Boolean",
+        default: true,
       },
       {
         id: "docx",
