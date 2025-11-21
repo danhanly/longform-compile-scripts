@@ -36,3 +36,11 @@ To activate these, wrap your copyright page content in a div with the id 'copyri
 ```
 
 There is a known issue with these being styled correctly, but I believe it's pandoc's problem not mine. The HTML tags need to be at the top-level of the scene's hierarchy, not nested beneath other headings. I suggest you create a dedicated scene for Copyright and a dedicated scene for Acknowledgements
+
+## Additional Scripts Included
+
+### Smart Style Replacer
+
+**Kind:** Scene
+
+A scene step that allows for applying custom styling to specific text blocks using simple regex markers (e.g., `>r`). It wraps the matching text in a Pandoc Fenced Div with both a DOCX custom style and a CSS class, enabling consistent styling across both .docx and .epub exports.
